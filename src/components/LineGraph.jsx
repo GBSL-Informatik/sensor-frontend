@@ -2,7 +2,7 @@ import React from "react";
 import { LineChart, Line, XAxis, Legend, YAxis, Tooltip } from 'recharts';
 import _ from 'lodash';
 
-export default class Wordcloud extends React.Component {
+export default class LineGraph extends React.Component {
   chartWrapper = React.createRef();
   state = {
     width: 600
@@ -21,20 +21,15 @@ export default class Wordcloud extends React.Component {
     this.setState({ width: this.chartWrapper.current.clientWidth });
   };
 
-  get data() {
-    return this.props.motionData;
-  }
-
   render() {
-    const data = this.data;
     return (
       <div className="word-cloud" ref={this.chartWrapper} style={{ width: '100%' }}>
-        {data.length > 0 && (
+        {this.props.motionData.length > 0 && (
           <LineChart
             width={this.state.width}
             height={400}
             domain = {['auto', 'auto']}
-            data={data}
+            data={this.props.motionData}
             margin={{ top: 20, right: 5, left: -20, bottom: 5 }}
           >
             <XAxis
