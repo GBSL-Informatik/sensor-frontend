@@ -1,6 +1,5 @@
 import React from "react";
 import { LineChart, Line, XAxis, Legend, YAxis, Tooltip } from 'recharts';
-import _ from 'lodash';
 
 export default class LineGraph extends React.Component {
   chartWrapper = React.createRef();
