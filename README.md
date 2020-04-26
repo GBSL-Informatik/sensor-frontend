@@ -4,7 +4,7 @@ A javascript react project using sockets to send and receive sensor data to/from
 
 The backend stores the sensor values in memory and provides the stream to all room members.
 
-[![Check it out on CodeSandbox](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/github/GBSL-Informatik/sensor-socket-frontend)
+[![Check it out on CodeSandbox](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/github/GBSL-Informatik/sensor-frontend)
 
 This should be used in combination with the [sensor-server](https://github.com/GBSL-Informatik/sensor-server).
 
