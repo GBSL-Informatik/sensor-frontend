@@ -3,21 +3,17 @@ import React from "react";
 export default class SensorConfig extends React.Component {
   chartWrapper = React.createRef();
 
-  changeDisplayDevice() {
-    this.props.setDisplayDevice(this.state.deviceName);
-  }
-
   render() {
     return (
       <div className="sensor-config">
-        <div>My Device Name: <b>{this.props.deviceName}</b></div>
+        <div>My Device Name: <b>{this.props.deviceId}</b></div>
 
         <span>
           <label htmlFor="devices">Choose a display device: </label>
           <select
             id="devices"
             onChange={(e, device) => this.props.setDisplayDevice(e.target.value)}
-            value={this.props.displayDevice}
+            value={this.props.displayDeviceId}
           >
             {
               this.props.devices.map(device => {

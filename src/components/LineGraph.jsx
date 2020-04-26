@@ -1,5 +1,5 @@
 import React from "react";
-import { LineChart, Line, XAxis, Legend, YAxis, Tooltip } from 'recharts';
+import { LineChart, Line, XAxis, Legend, YAxis, Tooltip } from "recharts";
 
 export default class LineGraph extends React.Component {
   chartWrapper = React.createRef();
@@ -8,12 +8,12 @@ export default class LineGraph extends React.Component {
   };
 
   componentDidMount() {
-    window.addEventListener('resize', this.onResize);
+    window.addEventListener("resize", this.onResize);
     this.setState({ width: this.chartWrapper.current.clientWidth });
   }
 
   componentWillUnmount() {
-    window.removeEventListener('resize', this.onResize);
+    window.removeEventListener("resize", this.onResize);
   }
 
   onResize = (event) => {
@@ -22,12 +22,12 @@ export default class LineGraph extends React.Component {
 
   render() {
     return (
-      <div className="word-cloud" ref={this.chartWrapper} style={{ width: '100%' }}>
+      <div className="word-cloud" ref={this.chartWrapper} style={{ width: "100%" }}>
         {this.props.motionData.length > 0 && (
           <LineChart
             width={this.state.width}
             height={400}
-            domain = {['auto', 'auto']}
+            domain = {["auto", "auto"]}
             data={this.props.motionData}
             margin={{ top: 20, right: 5, left: -20, bottom: 5 }}
           >

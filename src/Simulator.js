@@ -19,7 +19,7 @@ export default class MotionSimulator {
   counter = 0;
 
   constructor() {
-    this.deviceSimulator = document.getElementById('DeviceSimulator');
+    this.deviceSimulator = document.getElementById("DeviceSimulator");
     if (this.deviceSimulator) {
       this.intervalId = setInterval(this.emitMotionEvent, INTERVAL);
     }

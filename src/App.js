@@ -8,23 +8,38 @@ import MotionSimulator from "./Simulator";
 export const API_URL = "http://localhost:4001";
 
 export default class App extends React.Component {
-  deviceName = Math.random().toString(36).substr(2, 5).toUpperCase();
+  /**
+   * Generate a random string with 5 characters as the device id
+   */
+  deviceId = Math.random().toString(36).substr(2, 5).toUpperCase();
 
   state = {
     motionData: [],
-    displayDevice: '',
+    displayDeviceId: undefined,
     devices: [],
     useSimulatedDeviceMotion: false
   };
 
   componentDidMount() {
     this.socket = socketioClient(API_URL);
-    this.deviceSimulator = document.getElementById('DeviceSimulator');
+
+    /**
+     * register my device
+     */
+    this.socket.emit("new_device", { deviceId: this.deviceId });
+    /**
+     * ensure to receive the latest version of motion devices
+     */
 
     /**
      * configure how to treat to new messages from the server 
      */
-    this.socket.on("motion_devices", data => this.setState({ devices: data }));
+    this.socket.on("motion_devices", data => {
+      this.setMotionDevices(data);
+    });
+
+    this.socket.emit("get_devices");
+
     this.socket.on("motion_data", data => {
       if (data) {
         this.setState({ motionData: data })
@@ -32,37 +47,24 @@ export default class App extends React.Component {
     });
 
     /**
-     * register my device
-     */
-    this.socket.emit('new_device', { name: this.deviceName });
-    /**
-     * ensure to receive the latest version of motion devices
-     */
-    this.socket.emit('get_devices');
-
-    /**
-     * join the datastream of my device
-     */
-    this.setDisplayDevice(this.deviceName);
-
-    /**
      * register a function that is called whenever the window emits a
      * device motion event (e.g. whenever a new sensorvalue is present)
      */
-    window.addEventListener('devicemotion', this.onDevicemotion, true)
+    window.addEventListener("devicemotion", this.onDevicemotion, true)
   }
 
-  componentWillUnmount() {
-    /**
-     * cleanup - remove the eventlistener
-     */
-    window.removeEventListener('devicemotion', this.onDevicemotion, true);
-    this.socket.emit("remove_device", { name: this.deviceName });
+  setMotionDevices(motionDevices) {
+    this.setState({ devices: motionDevices })
+    // when the currently observed device is not present,
+    // display the data of my own device
+    if (!motionDevices.includes(this.state.displayDeviceId)) {
+      this.setDisplayDevice(this.deviceId);
+    }
   }
 
   onDevicemotion = (e) => {
     const motionData = {
-      name: this.deviceName,
+      deviceId: this.deviceId,
       timeStamp: e.timeStamp,
       x: e.accelerationIncludingGravity.x,
       y: e.accelerationIncludingGravity.y,
@@ -72,7 +74,7 @@ export default class App extends React.Component {
   };
 
   toggleUseSimulatedDeviceMotion = () => {
-    const deviceSimulator = document.getElementById('DeviceSimulator');
+    const deviceSimulator = document.getElementById("DeviceSimulator");
     if (!deviceSimulator) {
       return;
     }
@@ -80,15 +82,15 @@ export default class App extends React.Component {
     const useSimulator = !this.state.useSimulatedDeviceMotion;
     this.setState({ useSimulatedDeviceMotion: useSimulator });
     if (useSimulator) {
-      window.removeEventListener('devicemotion', this.onDevicemotion, true);
-      deviceSimulator.addEventListener('devicemotion', this.onDevicemotion, true);
+      window.removeEventListener("devicemotion", this.onDevicemotion, true);
+      deviceSimulator.addEventListener("devicemotion", this.onDevicemotion, true);
       const simulator = new MotionSimulator();
       this.setState({
         simulator: simulator
       });
     } else {
-      deviceSimulator.removeEventListener('devicemotion', this.onDevicemotion, true);
-      window.addEventListener('devicemotion', this.onDevicemotion, true);
+      deviceSimulator.removeEventListener("devicemotion", this.onDevicemotion, true);
+      window.addEventListener("devicemotion", this.onDevicemotion, true);
       if (this.state.simulator) {
         this.state.simulator.stopSimulation();
         this.setState({
@@ -98,21 +100,21 @@ export default class App extends React.Component {
     }
   }
 
-  setDisplayDevice = (deviceName) => {
+  setDisplayDevice = (deviceId) => {
     // subscribe to the new sensor data
     this.socket.emit(
-      'display_device',
+      "display_device",
       {
-        name: deviceName,
-        oldDevice: this.state.displayDevice
+        deviceId: deviceId,
+        oldDeviceId: this.state.displayDeviceId
       }
     );
-    // save the displayDevice locally
-    this.setState({ displayDevice: deviceName });
+    // save the displayDeviceId locally
+    this.setState({ displayDeviceId: deviceId });
   }
 
   clearMotionData = () => {
-    this.socket.emit('clear_motion_data', { name: this.state.displayDevice })
+    this.socket.emit("clear_motion_data", { deviceId: this.state.displayDeviceId })
   }
 
   render() {
@@ -123,8 +125,8 @@ export default class App extends React.Component {
         <SensorConfig
           setDisplayDevice={this.setDisplayDevice}
           devices={this.state.devices}
-          deviceName={this.deviceName}
-          displayDevice={this.state.displayDevice}
+          deviceId={this.deviceId}
+          displayDeviceId={this.state.displayDeviceId}
           toggleUseSimulatedDeviceMotion={this.toggleUseSimulatedDeviceMotion}
           useSimulatedDeviceMotion={this.state.useSimulatedDeviceMotion}
         />
