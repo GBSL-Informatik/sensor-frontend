@@ -17,12 +17,8 @@ export default class App extends React.Component {
     useSimulatedDeviceMotion: false
   };
 
-  constructor() {
-    super();
-    this.socket = socketioClient(API_URL);
-  }
-
   componentDidMount() {
+    this.socket = socketioClient(API_URL);
     this.deviceSimulator = document.getElementById('DeviceSimulator');
 
     /**
@@ -119,23 +115,11 @@ export default class App extends React.Component {
     this.socket.emit('clear_motion_data', { name: this.state.displayDevice })
   }
 
-  clearDevices = () => {
-    const response = window.confirm("Do you really want to clear all devices?");
-    if (response === true) {
-      this.socket.emit('clear_devices');
-      this.socket.emit('new_device', { name: this.deviceName });
-      this.socket.emit('get_devices');
-    }
-  }
-
   render() {
     return (
       <div className="App">
         <h1>Socket Sensor Stream</h1>
-        <span>
-          <button onClick={this.clearMotionData}>Clear current Motion Data</button>
-          <button onClick={this.clearDevices}>Clear Devices</button>
-        </span>
+        <button onClick={this.clearMotionData}>Clear current Motion Data</button>
         <SensorConfig
           setDisplayDevice={this.setDisplayDevice}
           devices={this.state.devices}
